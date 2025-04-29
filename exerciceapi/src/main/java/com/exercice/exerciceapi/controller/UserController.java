@@ -5,6 +5,7 @@ import com.exercice.exerciceapi.model.LoginRequest;
 import com.exercice.exerciceapi.model.User;
 import com.exercice.exerciceapi.model.UserResponseDto;
 import com.exercice.exerciceapi.repository.UserRepository;
+import com.exercice.exerciceapi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +17,19 @@ import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+
 @RestController
 public class UserController {
 
     private final UserRepository userRepository;
 
+    private final JwtUtil jwtUtil;
+
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/user/{id}")
@@ -56,13 +62,17 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.getPassword().equals(loginRequest.getPassword())) {
-                return ResponseEntity.ok("connection successful");
+                // Génération du token
+                String token = jwtUtil.generateToken(user.getEmail());
+
+                // Retourne le token dans un objet JSON
+                return ResponseEntity.ok().body("{\"token\":\"" + token + "\"}");
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong password");
             }
@@ -70,6 +80,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
+
 
     @GetMapping("/users")
     public List<UserResponseDto> getAllUsers() {
