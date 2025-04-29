@@ -26,29 +26,9 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/hello")
-    public String sayHello(){
-        return "Saluuuuuuuuuut!";
-    }
-
-    @GetMapping("/users")
-    public List<User>getUser(){
-        return userRepository.findAll();
-    }
-
     @GetMapping("/user/{id}")
     public User getUserById(@PathVariable Long id){
         return userRepository.findById(id).orElse(null);
-    }
-
-    @GetMapping("/user-id/{email}")
-    public Long getUserByEmail(@PathVariable String email){
-        return userRepository.findDirectByEmail(email).getId();
-    }
-
-    @PostMapping("/users")
-    public User addUser(@RequestBody User user){
-        return userRepository.save(user);
     }
 
     @PostMapping("/users")

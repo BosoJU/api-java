@@ -17,8 +17,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public boolean changePassword(String username, String oldPassword, String newPassword, String confirmNewPassword) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
+    public boolean changePassword(String email, String oldPassword, String newPassword, String confirmNewPassword) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         // Vérifie si l'utilisateur existe
         if (!optionalUser.isPresent()) {
@@ -44,4 +44,5 @@ public class UserService {
         return true;
     }
 }
+
 
